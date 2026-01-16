@@ -1,0 +1,30 @@
+# ============================
+# IGNORE DEPENDENCIES
+# ============================
+**/node_modules
+**/npm-debug.log
+**/yarn-error.log
+
+# ============================
+# IGNORE ENVIRONMENT VARIABLES (SECRETS)
+# ============================
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
+# ============================
+# IGNORE BUILD OUTPUTS
+# ============================
+**/dist
+**/build
+**/coverage
+
+# ============================
+# IGNORE UPLOADS & OS FILES
+# ============================
+**/uploads
+.DS_Store
+Thumbs.db
+**/config

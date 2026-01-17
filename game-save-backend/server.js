@@ -15,7 +15,14 @@ const PORT = 5000;
 
 app.use(cors()); 
 app.use(express.json()); 
-const upload = multer({ dest: 'uploads/' })
+
+const storage =
+  process.env.NODE_ENV === "production"
+    ? multer.memoryStorage()
+    : multer.diskStorage({ destination: "uploads/" });
+
+const upload = multer({ storage });
+
 
 
 

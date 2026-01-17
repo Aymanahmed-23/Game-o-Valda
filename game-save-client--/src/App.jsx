@@ -7,11 +7,13 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import './App.css'; // Make sure this file exists
 import Register from './register.jsx';
 import Login from './login.jsx';
+import { useAuth0 } from "@auth0/auth0-react";
+
 
 // ==========================================
 // 1. SAFE DASHBOARD COMPONENT
 // ==========================================
-const Dashboard = ({ saves, username, searchTerm, setSearchTerm, isUploading, handleFileUpload, handleDelete, handleDownload }) => {
+const Dashboard = ({ saves, username, logout, isAuthenticated, searchTerm, setSearchTerm, isUploading, handleFileUpload, handleDelete, handleDownload }) => {
   
  
   const safeSaves = Array.isArray(saves) ? saves : [];
@@ -93,13 +95,16 @@ const Dashboard = ({ saves, username, searchTerm, setSearchTerm, isUploading, ha
   </nav>
 
   <div className="sidebar-footer">
-    {username && (
+    {(isAuthenticated || username) && (
       <button
         className="logout-btn"
-        onClick={() => {
-          localStorage.removeItem("activeUser");
-          window.location.href = "/login";
-        }}
+       onClick={() => {
+        
+        localStorage.removeItem("activeUser"); 
+        
+        
+        logout({ logoutParams: { returnTo: window.location.origin } });
+      }}
       >
         <LogOut size={20} />
         <span>Logout</span>
@@ -210,12 +215,57 @@ const Dashboard = ({ saves, username, searchTerm, setSearchTerm, isUploading, ha
 // 2. MAIN GAMEVAULT COMPONENT (Logic)
 // ==========================================
 export default function GameVault() {
-  const [username, setUsername] = useState(localStorage.getItem('activeUser') || "");
-  const [saves, setSaves] = useState([]); // Initialize as empty array
+const { user: googleUser, isAuthenticated, logout } = useAuth0();
+const [sqlUser, setSqlUser] = useState(localStorage.getItem('activeUser') || "");
+const username = isAuthenticated
+  ? googleUser?.name
+  : sqlUser;
+  const dbUsername = sqlUser;
+  const [saves, setSaves] = useState([]); 
   const [searchTerm, setSearchTerm] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
-  // --- REUSABLE FETCH FUNCTION ---
+
+
+  
+useEffect(() => {
+  const syncGoogleUser = async () => {
+    
+    if (isAuthenticated && googleUser) {
+      try {
+        const response = await fetch('http://localhost:5000/google-login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: user.email,
+            name: user.name
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Sync success:", data);
+          
+          
+          localStorage.setItem("activeUser", data.username);
+        } else {
+          console.error("Sync failed:", await response.text());
+        }
+
+      } catch (error) {
+        console.error("Network error during sync:", error);
+      }
+    }
+  };
+
+  syncGoogleUser();
+}, [isAuthenticated, googleUser]);
+
+
+
+ 
   const fetchSaves = () => {
     if (!username) return;
     
@@ -283,6 +333,8 @@ export default function GameVault() {
     }
   };
 
+  
+
   // --- DELETE HANDLER ---
   const handleDelete = async(id) => {
     // Optimistic UI update
@@ -309,6 +361,8 @@ export default function GameVault() {
         <Route path="/" element={
           <Dashboard 
             username={username}
+            isAuthenticated={isAuthenticated}
+            logout={logout}
             saves={saves}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}

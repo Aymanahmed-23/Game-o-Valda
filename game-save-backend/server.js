@@ -168,6 +168,34 @@ app.get('/api/saves/:id/download', async (req, res) => {
 });
 
 
+app.post("/google-login", async (req, res) => {
+  const { email, name } = req.body;
+
+  try {
+    const [existing] = await pool.query(
+      "SELECT username FROM users WHERE email = ?",
+      [email]
+    );
+
+    // User already exists
+    if (existing.length > 0) {
+      return res.json({ username: existing[0].username });
+    }
+
+    
+    const username = name || email.split("@")[0];
+
+    await pool.query(
+      "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+      [username, email, "GOOGLE_USER"]
+    );
+
+    res.json({ username });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Google login failed" });
+  }
+});
 
 
 app.listen(PORT, () => {

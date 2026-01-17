@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Lock, Gamepad2, ArrowRight } from 'lucide-react';
-import './Login.css';
+import './login.css';
 
 export default function Register() {
   const [username, setUsername] = useState('');

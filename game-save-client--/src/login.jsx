@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Lock, Eye, EyeOff, Gamepad2 } from 'lucide-react';
-import './Login.css';
+import './login.css';
 import { useAuth0 } from "@auth0/auth0-react";
 
 

@@ -6,6 +6,11 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+console.log("MYSQLHOST:", process.env.MYSQLHOST);
+console.log("MYSQLUSER:", process.env.MYSQLUSER);
+console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE);
+console.log("MYSQLPORT:", process.env.MYSQLPORT);
+
 
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });

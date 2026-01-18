@@ -44,7 +44,7 @@ const initDB = async () => {
 };
 
 
-initDB();
+//initDB();
 
 
 

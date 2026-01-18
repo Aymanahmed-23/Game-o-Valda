@@ -18,7 +18,11 @@ app.use(express.json());
 const upload = multer({ dest: 'uploads/' })
 
 
+import fs from "fs";
 
+if (!fs.existsSync("uploads")) {
+  fs.mkdirSync("uploads");
+}
 
 
 
@@ -140,16 +144,6 @@ app.post(
 );
 
 
-app.get('/api/saves', async (req, res) => {
-  const { username } = req.query; 
-  try {
-   
-    const [rows] = await pool.query("SELECT * FROM saves WHERE username = ?", [username]);
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 
 
@@ -198,8 +192,8 @@ app.post("/google-login", async (req, res) => {
 });
 
 
-//export default app;
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

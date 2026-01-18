@@ -10,6 +10,34 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+const initDB = async () => {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      username VARCHAR(100) UNIQUE NOT NULL,
+      password VARCHAR(255),
+      email VARCHAR(255) UNIQUE
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS saves (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      username VARCHAR(100) NOT NULL,
+      gameName VARCHAR(255),
+      fileName VARCHAR(255),
+      size VARCHAR(50),
+      uploadDate DATETIME,
+      playtime VARCHAR(50),
+      filePath VARCHAR(255)
+    )
+  `);
+
+  console.log("Database tables ensured");
+};
+
+initDB();
+
 
 
 
@@ -25,6 +53,13 @@ if (!fs.existsSync("uploads")) {
 }
 
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "Backend is running",
+  });
+});
+
 
 app.get('/api/saves', async (req, res) => {
   const { username } = req.query; 
@@ -36,6 +71,8 @@ app.get('/api/saves', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
 
 
 

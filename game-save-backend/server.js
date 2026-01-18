@@ -239,6 +239,16 @@ app.post("/google-login", async (req, res) => {
   }
 });
 
+app.get("/db-test", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT 1 AS ok");
+    res.json({ db: "connected", result: rows });
+  } catch (err) {
+    console.error("DB TEST ERROR:", err.message);
+    res.status(500).json({ db: "failed", error: err.message });
+  }
+});
+
 
 const PORT = process.env.PORT || 5000;
 

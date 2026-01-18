@@ -12,6 +12,9 @@ const app = express();
 
 const initDB = async () => {
   try {
+    const [db] = await pool.query("SELECT DATABASE() AS db");
+    console.log("Connected to DB:", db[0].db);
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -36,9 +39,10 @@ const initDB = async () => {
 
     console.log("Database tables ensured");
   } catch (err) {
-    console.error("DB init failed (non-fatal):", err.message);
+    console.error("DB init failed:", err.message);
   }
 };
+
 
 initDB();
 

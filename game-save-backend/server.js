@@ -9,20 +9,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 5000;
+
 
 
 
 app.use(cors()); 
 app.use(express.json()); 
-
-const storage =
-  process.env.NODE_ENV === "production"
-    ? multer.memoryStorage()
-    : multer.diskStorage({ destination: "uploads/" });
-
-const upload = multer({ storage });
-
+const upload = multer({ dest: 'uploads/' })
 
 
 
@@ -205,8 +198,8 @@ app.post("/google-login", async (req, res) => {
 });
 
 
-export default app;
-//const PORT = 5000;
-//app.listen(PORT, () => {
-  //console.log(`Server running on http://localhost:${PORT}`);
-//});
+//export default app;
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});

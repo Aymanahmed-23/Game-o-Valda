@@ -11,29 +11,33 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 const initDB = async () => {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      username VARCHAR(100) UNIQUE NOT NULL,
-      password VARCHAR(255),
-      email VARCHAR(255) UNIQUE
-    )
-  `);
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(100) UNIQUE NOT NULL,
+        password VARCHAR(255),
+        email VARCHAR(255) UNIQUE
+      )
+    `);
 
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS saves (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      username VARCHAR(100) NOT NULL,
-      gameName VARCHAR(255),
-      fileName VARCHAR(255),
-      size VARCHAR(50),
-      uploadDate DATETIME,
-      playtime VARCHAR(50),
-      filePath VARCHAR(255)
-    )
-  `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS saves (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(100) NOT NULL,
+        gameName VARCHAR(255),
+        fileName VARCHAR(255),
+        size VARCHAR(50),
+        uploadDate DATETIME,
+        playtime VARCHAR(50),
+        filePath VARCHAR(255)
+      )
+    `);
 
-  console.log("Database tables ensured");
+    console.log("Database tables ensured");
+  } catch (err) {
+    console.error("DB init failed (non-fatal):", err.message);
+  }
 };
 
 initDB();
@@ -41,16 +45,19 @@ initDB();
 
 
 
+
 app.use(cors()); 
 app.use(express.json()); 
-const upload = multer({ dest: 'uploads/' })
+const upload = multer({
+  storage:
+    process.env.NODE_ENV === "production"
+      ? multer.memoryStorage()
+      : multer.diskStorage({ destination: "uploads/" })
+});
 
 
-import fs from "fs";
 
-if (!fs.existsSync("uploads")) {
-  fs.mkdirSync("uploads");
-}
+
 
 
 app.get("/", (req, res) => {
